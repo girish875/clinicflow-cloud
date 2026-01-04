@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: clinicflowCloud
+Bundle-SymbolicName: clinicflowCloud
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Automatic-Module-Name: clinicflowCloud
+Require-Bundle: org.eclipse.emf.ecore,
+ org.eclipse.emf.common,
+ org.eclipse.xtext,
+ org.eclipse.xtext.util,
+ org.eclipse.xtext.xbase.lib,
+ org.eclipse.core.runtime,
+ org.clinicflow,
+ org.clinicflow.ide
+Export-Package: cloud

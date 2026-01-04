@@ -1,0 +1,4 @@
+digraph ClinicFlow {
+  CheckIn -> Assessment;
+  Assessment -> Consultation;
+}

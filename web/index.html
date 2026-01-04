@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ClinicFlow Cloud IDE</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        textarea { width: 100%; height: 300px; }
+        img { margin-top: 20px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin-top: 10px; }
+        pre { color: red; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+
+<h2>ClinicFlow Cloud IDE</h2>
+
+<textarea id="dsl">
+workflow ClinicDay
+type Outpatient priority High hosted on AWS {
+    start -> CheckIn
+
+    stage CheckIn:
+        CHECK_IN by Admin
+
+    stage Assessment:
+        ASSESSMENT by Nurse
+
+    stage Consultation:
+        CONSULTATION by Doctor
+
+    CheckIn -> Assessment
+    Assessment -> Consultation
+
+    end Completed
+}
+</textarea>
+
+<br>
+<button onclick="generate()">Generate Diagram</button>
+
+<br><br>
+<pre id="error"></pre>
+<img id="result"/>
+
+<script>
+function generate() {
+    fetch("/compile", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: document.getElementById("dsl").value
+    })
+    .then(res => {
+        if (!res.ok) {
+            return res.json().then(j => { throw j.error; });
+        }
+        return res.blob();
+    })
+    .then(blob => {
+        document.getElementById("error").textContent = "";
+        document.getElementById("result").src =
+            URL.createObjectURL(blob);
+    })
+    .catch(err => {
+        document.getElementById("result").src = "";
+        document.getElementById("error").textContent = err;
+    });
+}
+</script>
+
+</body>
+</html>
