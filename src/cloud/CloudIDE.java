@@ -11,13 +11,22 @@ public class CloudIDE {
 
     public static void main(String[] args) throws Exception {
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        // 🔑 CLOUD-SAFE PORT (Railway / Render / Local)
+        int port = Integer.parseInt(
+            System.getenv().getOrDefault("PORT", "8080")
+        );
+
+        HttpServer server = HttpServer.create(
+            new InetSocketAddress(port), 0
+        );
 
         server.createContext("/", CloudIDE::handleIndex);
         server.createContext("/compile", CloudIDE::handleCompile);
 
         server.start();
-        System.out.println("✔ ClinicFlow Cloud IDE running at http://localhost:8080");
+        System.out.println(
+            "✔ ClinicFlow Cloud IDE running on port " + port
+        );
     }
 
     // Serve IDE page
@@ -117,22 +126,30 @@ public class CloudIDE {
         }
 
         String input = new String(
-                exchange.getRequestBody().readAllBytes(),
-                StandardCharsets.UTF_8
+            exchange.getRequestBody().readAllBytes(),
+            StandardCharsets.UTF_8
         );
 
         try {
-            ClinicFlowCompilerService service = new ClinicFlowCompilerService();
+            ClinicFlowCompilerService service =
+                new ClinicFlowCompilerService();
+
             byte[] png = service.compileToPng(input);
 
-            exchange.getResponseHeaders().add("Content-Type", "image/png");
+            exchange.getResponseHeaders()
+                .add("Content-Type", "image/png");
+
             exchange.sendResponseHeaders(200, png.length);
             exchange.getResponseBody().write(png);
 
         } catch (Exception e) {
             //  SEND PLAIN TEXT ERROR (SAFE FOR MULTI-LINE)
-            byte[] msg = e.getMessage().getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "text/plain");
+            byte[] msg =
+                e.getMessage().getBytes(StandardCharsets.UTF_8);
+
+            exchange.getResponseHeaders()
+                .add("Content-Type", "text/plain");
+
             exchange.sendResponseHeaders(400, msg.length);
             exchange.getResponseBody().write(msg);
         }
